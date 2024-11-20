@@ -1,0 +1,76 @@
+# Ignore build and compiled output
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.log
+
+# Ignore user-specific and temporary files
+*.user
+*.suo
+*.tmp
+*.bak
+*.swp
+*.log
+*.db
+*.cache
+
+# Ignore Visual Studio specific files
+.vscode/
+.idea/
+.vs/
+*.sln.docstates
+*.sln.ide.*
+*.pidb
+*.userprefs
+
+# Ignore OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Ignore PowerShell backup and temporary files
+*.ps1~
+*.ps1.bak
+
+# Ignore environment and secret files
+*.config
+*.env
+.env.local
+.env.production
+
+# Ignore log files
+logs/
+*.log
+
+# Ignore NuGet and package management output
+packages/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+.nuget/
+
+# Ignore generated files for InstallUtil
+*.InstallLog
+*.InstallState
+
+# Ignore any additional deployment or temporary files
+PublishOutput/
+ServiceBackup/
+
+# If using ReSharper or other IDE tools
+_ReSharper*/
+*.DotSettings.user
+
+# Ignore Windows Service specific files
+*.Designer.cs
+ServiceInstaller.*
+ProjectInstaller.*
+
+# Ignore build artifacts for scripts
+*.zip
+*.tar.gz
+
+# If using third-party build tools (e.g., MSBuild artifacts)
+artifacts/
