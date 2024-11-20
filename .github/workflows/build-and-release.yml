@@ -16,13 +16,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Locate MSBuild using vswhere
+      # Step 2: Locate MSBuild with Optimized vswhere Query
       - name: Locate MSBuild
         id: locate-msbuild
         run: |
-          $msbuildPath = &"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe
+          $vswhere = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe"
+          $msbuildPath = & $vswhere -latest -requires Microsoft.Component.MSBuild -products * -property installationPath
           if (-Not $msbuildPath) {
             throw "MSBuild not found. Ensure Visual Studio is installed on the runner."
+          }
+          $msbuildPath = Join-Path -Path $msbuildPath -ChildPath "MSBuild\Current\Bin\MSBuild.exe"
+          if (-Not (Test-Path $msbuildPath)) {
+            throw "MSBuild executable not found at $msbuildPath"
           }
           Write-Host "MSBuild located at: $msbuildPath"
           echo "MSBUILD=$msbuildPath" >> $GITHUB_ENV
@@ -30,12 +35,12 @@ jobs:
       # Step 3: Build the Project
       - name: Build Project
         run: |
-          $env:MSBUILD MySQLBackup.sln /p:Configuration=Release
+          & $env:MSBUILD MySQLBackup.sln /p:Configuration=Release
 
       # Step 4: Publish Build Artifacts
       - name: Publish Build Artifacts
         run: |
-          $env:MSBUILD MySQLBackup.sln /t:Publish /p:Configuration=Release /p:PublishDir=./publish
+          & $env:MSBUILD MySQLBackup.sln /t:Publish /p:Configuration=Release /p:PublishDir=./publish
 
       # Step 5: Upload Build Artifact
       - name: Upload Build Artifact
