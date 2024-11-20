@@ -16,15 +16,28 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Build the project using MSBuild
+      # Step 2: Locate MSBuild and Build the Project
       - name: Build Project
+        shell: pwsh
         run: |
-          msbuild MySQLBackup.sln /p:Configuration=Release
+          $msbuildPath = "${{ env.PROGRAMFILES(X86) }}\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
+          if (-Not (Test-Path $msbuildPath)) {
+            $msbuildPath = "${{ env.PROGRAMFILES(X86) }}\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe"
+          }
+          if (-Not (Test-Path $msbuildPath)) {
+            throw "MSBuild not found. Ensure Visual Studio is installed on the runner."
+          }
+          & $msbuildPath MySQLBackup.sln /p:Configuration=Release
 
       # Step 3: Publish the build artifacts
       - name: Publish Build Artifacts
+        shell: pwsh
         run: |
-          msbuild MySQLBackup.sln /t:Publish /p:Configuration=Release /p:PublishDir=./publish
+          $msbuildPath = "${{ env.PROGRAMFILES(X86) }}\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
+          if (-Not (Test-Path $msbuildPath)) {
+            $msbuildPath = "${{ env.PROGRAMFILES(X86) }}\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe"
+          }
+          & $msbuildPath MySQLBackup.sln /t:Publish /p:Configuration=Release /p:PublishDir=./publish
 
       # Step 4: Upload the artifact for release
       - name: Upload Build Artifact
