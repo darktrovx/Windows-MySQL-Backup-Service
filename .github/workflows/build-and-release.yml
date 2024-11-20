@@ -16,30 +16,31 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Locate MSBuild and Build the Project
-      - name: Build Project
-        shell: pwsh
+      # Step 2: Set up Environment Variables for MSBuild Path
+      - name: Set MSBuild Path
+        id: set-msbuild-path
         run: |
-          $msbuildPath = "${{ env.PROGRAMFILES(X86) }}\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
+          $msbuildPath = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
           if (-Not (Test-Path $msbuildPath)) {
-            $msbuildPath = "${{ env.PROGRAMFILES(X86) }}\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe"
+            $msbuildPath = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe"
           }
           if (-Not (Test-Path $msbuildPath)) {
             throw "MSBuild not found. Ensure Visual Studio is installed on the runner."
           }
-          & $msbuildPath MySQLBackup.sln /p:Configuration=Release
+          echo "msbuild=$msbuildPath" >> $GITHUB_ENV
 
-      # Step 3: Publish the build artifacts
-      - name: Publish Build Artifacts
-        shell: pwsh
+      # Step 3: Build the Project
+      - name: Build Project
         run: |
-          $msbuildPath = "${{ env.PROGRAMFILES(X86) }}\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
-          if (-Not (Test-Path $msbuildPath)) {
-            $msbuildPath = "${{ env.PROGRAMFILES(X86) }}\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe"
-          }
-          & $msbuildPath MySQLBackup.sln /t:Publish /p:Configuration=Release /p:PublishDir=./publish
+          $env:MSBUILD | Out-Null
+          $env:MSBUILD MySQLBackup.sln /p:Configuration=Release
 
-      # Step 4: Upload the artifact for release
+      # Step 4: Publish the Build Artifacts
+      - name: Publish Build Artifacts
+        run: |
+          $env:MSBUILD MySQLBackup.sln /t:Publish /p:Configuration=Release /p:PublishDir=./publish
+
+      # Step 5: Upload Build Artifact
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -56,13 +57,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Download the build artifact
+      # Step 2: Download Build Artifact
       - name: Download Build Artifact
         uses: actions/download-artifact@v3
         with:
           name: Windows-MySQL-Backup-Service
 
-      # Step 3: Create a GitHub Release
+      # Step 3: Create GitHub Release
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
