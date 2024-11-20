@@ -16,21 +16,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Locate MSBuild
-      - name: Locate MSBuild
-        id: locate-msbuild
-        run: |
-          $vswhere = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe"
-          $msbuildPath = & $vswhere -latest -requires Microsoft.Component.MSBuild -products * -property installationPath
-          if (-Not $msbuildPath) {
-            throw "MSBuild not found. Ensure Visual Studio is installed on the runner."
-          }
-          $msbuildPath = Join-Path -Path $msbuildPath -ChildPath "MSBuild\Current\Bin\MSBuild.exe"
-          if (-Not (Test-Path $msbuildPath)) {
-            throw "MSBuild executable not found at $msbuildPath"
-          }
-          Write-Host "MSBuild located at: $msbuildPath"
-          echo "MSBUILD=$msbuildPath" >> $GITHUB_ENV
+      # Step 2: Set MSBuild Path (Hardcoded)
+      - name: Set MSBuild Path
+        run: echo "MSBUILD=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe" >> $GITHUB_ENV
 
       # Step 3: Debug MSBUILD Path
       - name: Debug MSBUILD Path
