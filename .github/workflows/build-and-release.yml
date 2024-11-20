@@ -15,21 +15,25 @@ jobs:
       # Step 1: Checkout the repository
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
+      # Step 2: Debug Directory Structure
       - name: Debug Directory Structure
-        run: dir /s
-        
-      # Step 2: Build the Project
+        run: |
+          Get-ChildItem -Path . -Recurse
+
+      # Step 3: Build the Project
       - name: Build Project
         run: |
-          & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe" src/MySQLBackup.sln /p:Configuration=Release
+          & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe" MySQLBackup.sln /p:Configuration=Release
 
-      # Step 3: Publish Build Artifacts
+      # Step 4: Publish Build Artifacts
       - name: Publish Build Artifacts
         run: |
-          & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe" src/MySQLBackup.sln /t:Publish /p:Configuration=Release /p:PublishDir=./publish
+          & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe" MySQLBackup.sln /t:Publish /p:Configuration=Release /p:PublishDir=./publish
 
-      # Step 4: Upload Build Artifact
+      # Step 5: Upload Build Artifact
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
         with:
